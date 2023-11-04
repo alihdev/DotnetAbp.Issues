@@ -37,6 +37,9 @@ using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.UI;
 using Volo.Abp.UI.Navigation;
 using Volo.Abp.VirtualFileSystem;
+using Microsoft.AspNetCore.Localization;
+using System.Collections.Generic;
+using System.Globalization;
 
 namespace DotnetAbp.Issues.Web;
 
@@ -68,7 +71,7 @@ public class IssuesWebModule : AbpModule
                 typeof(IssuesWebModule).Assembly
             );
         });
-        
+
         PreConfigure<OpenIddictBuilder>(builder =>
         {
             builder.AddValidation(options =>
@@ -95,7 +98,7 @@ public class IssuesWebModule : AbpModule
         ConfigureAutoApiControllers();
         ConfigureSwaggerServices(context.Services);
     }
-    
+
     private void ConfigureAuthentication(ServiceConfigurationContext context)
     {
         context.Services.ForwardIdentityAuthenticationForBearer(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
@@ -122,7 +125,7 @@ public class IssuesWebModule : AbpModule
             );
         });
     }
-    
+
     private void ConfigureAutoMapper()
     {
         Configure<AbpAutoMapperOptions>(options =>
@@ -211,7 +214,7 @@ public class IssuesWebModule : AbpModule
             app.UseDeveloperExceptionPage();
         }
 
-        app.UseAbpRequestLocalization();
+        UseRequestLocalization(app);
 
         if (!env.IsDevelopment())
         {
@@ -239,5 +242,47 @@ public class IssuesWebModule : AbpModule
         app.UseAuditing();
         app.UseAbpSerilogEnrichers();
         app.UseConfiguredEndpoints();
+    }
+
+    /// <summary>
+    /// Configures the application to use request localization, enabling support for multiple languages and cultures.
+    /// This method establishes the supported cultures, default request culture, and request culture providers for localization.
+    /// It also resolves a specific issue with Arabic ('ar') culture's number formatting by aligning it with the 'en' culture.
+    /// </summary>
+    private static void UseRequestLocalization(IApplicationBuilder app)
+    {
+        // --------------------------------------
+        // Issue with 'ar' (-1, 1.25, ..)
+        // --------------------------------------
+        // app.UseAbpRequestLocalization();
+        // --------------------------------------
+
+        var enCultureInfo = new CultureInfo("en");
+        var arCultureInfo = new CultureInfo("ar");
+
+        // Fix by making the NumberFormat for 'ar' the same as for 'en'.
+        arCultureInfo.NumberFormat = enCultureInfo.NumberFormat;
+
+        // Or custom it
+        // arCultureInfo.NumberFormat.NegativeSign = enCultureInfo.NumberFormat.NegativeSign;
+        // arCultureInfo.NumberFormat.CurrencyDecimalSeparator = enCultureInfo.NumberFormat.CurrencyDecimalSeparator;
+        // arCultureInfo.NumberFormat.CurrencyGroupSeparator = enCultureInfo.NumberFormat.CurrencyGroupSeparator;
+        // arCultureInfo.NumberFormat.NumberDecimalSeparator = enCultureInfo.NumberFormat.NumberDecimalSeparator;
+        // arCultureInfo.NumberFormat.NumberGroupSeparator = enCultureInfo.NumberFormat.NumberGroupSeparator;
+        // arCultureInfo.NumberFormat.PercentDecimalSeparator = enCultureInfo.NumberFormat.PercentDecimalSeparator;
+        // arCultureInfo.NumberFormat.PercentGroupSeparator = enCultureInfo.NumberFormat.PercentGroupSeparator;
+
+        var supportedCultures = new[] { arCultureInfo, enCultureInfo };
+
+        app.UseAbpRequestLocalization(options =>
+        {
+            options.DefaultRequestCulture = new RequestCulture("ar");
+            options.SupportedCultures = supportedCultures;
+            options.SupportedUICultures = supportedCultures;
+            options.RequestCultureProviders = new List<IRequestCultureProvider>
+            {
+                new AcceptLanguageHeaderRequestCultureProvider()
+            };
+        });
     }
 }
