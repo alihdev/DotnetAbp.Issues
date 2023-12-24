@@ -1,0 +1,9 @@
+{
+  "version": "0.1.0",
+  "name": "EShopOnAbpAuthServer",
+  "private": true,
+  "dependencies": {
+    "@abp/aspnetcore.mvc.ui.theme.basic": "~7.0.0",
+    "@volo/account": "~7.0.0"
+  }
+}
