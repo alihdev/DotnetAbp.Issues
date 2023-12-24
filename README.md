@@ -1,3 +1,6 @@
+# issues
+- dynamic permission : https://github.com/abpframework/eShopOnAbp/issues/214
+
 # eShopOnAbp
 
 This is a reference project for those who want to build microservice solutions with the ABP Framework.
