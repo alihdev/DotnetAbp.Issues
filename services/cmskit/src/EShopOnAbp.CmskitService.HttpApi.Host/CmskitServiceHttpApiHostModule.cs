@@ -96,6 +96,11 @@ public class CmskitServiceHttpApiHostModule : AbpModule
         {
             options.EntityTypes.Add(new RatingEntityTypeDefinition("quote"));
         });
+
+        Configure<Volo.Abp.PermissionManagement.PermissionManagementOptions>(options =>
+        {
+            options.IsDynamicPermissionStoreEnabled = true;
+        });
     }
 
     public override void OnApplicationInitialization(ApplicationInitializationContext context)
