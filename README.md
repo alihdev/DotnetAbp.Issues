@@ -1,5 +1,10 @@
 # issues
 - dynamic permission : https://github.com/abpframework/eShopOnAbp/issues/214
+- management providers : https://github.com/abpframework/eShopOnAbp/issues/214#issuecomment-1870849504
+> (Autofac.Core.DependencyResolutionException: An exception was thrown while activating Volo.Abp.PermissionManagement.Identity.RolePermissionManagementProvider. ---> Autofac.Core.DependencyResolutionException: None of the constructors found on type 'Volo.A…)
+#### resolved by add in host:
+> typeof(AbpIdentityHttpApiClientModule)
+
 
 # eShopOnAbp
 
